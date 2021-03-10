@@ -66,15 +66,18 @@ public class Cezar {
         }
     }
 
-    public static void writeFile(String path,String text) {
+    public static void writeFile(String path,String text,boolean append) {
         try {
             File myObj = new File(path);
             if (!myObj.exists()) {
                 myObj.createNewFile();
             }
-            PrintWriter pw = new PrintWriter(myObj);
-            pw.println(text);
-            pw.close();
+            FileWriter fw = new FileWriter(myObj,append);
+            fw.write(text + "\n");
+            fw.close();
+            //PrintWriter pw = new PrintWriter(myObj);
+            //pw.println(text);
+            //pw.close();
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -139,7 +142,7 @@ public class Cezar {
         setK(Math.floorMod((int)a - (int)b,26));
         System.out.println(getK());
         if(getK() >= 1 && 25 >= getK()){
-            writeFile("files/key-found.txt",String.valueOf(getK()));
+            writeFile("files/key-found.txt",String.valueOf(getK()),false);
         }
         else {
             System.exit(0);
@@ -147,7 +150,10 @@ public class Cezar {
     }
 
     public static void caesarCryptogram() {
-        
+        readFile("files/crypto.txt");
+        for(int k = 1; k < 26; k++) {
+            writeFile("files/decrypt.txt",decrypt(getData(),k),true);
+        }
     }
 
 
@@ -165,7 +171,7 @@ public class Cezar {
     }
 
     public static void main(String[] args) {
-        caesarCrypto();
+        caesarCryptogram();
         //etKey();
         //readFile("files/plain.txt");
         //writeFile("files/crypto.txt",encrypt(getData(),getK()));
