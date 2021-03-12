@@ -48,15 +48,26 @@ public class Cezar {
         }
     }
 
-    public static boolean rightValue(String str) {
-        return Integer.parseInt(str) >= 1 && Integer.parseInt(str) <= 25;
+    public static boolean aAffineValue(String str) {
+        int[] a ={1,3,5,7,9,11,15,17,19,21,23,25};
+        for(int i:a)
+            if(i == Integer.parseInt(str))
+                return true;
+        return false;
+    }
+
+    public static boolean rightValue(String str,boolean caesar) {
+        if(caesar)
+            return Integer.parseInt(str) >= 1 && Integer.parseInt(str) <= 25;
+        else
+            return Integer.parseInt(str) >= 0 && Integer.parseInt(str) <= 25;
     }
 
     public static void getKeyCaesar(String path) {
         readFile(path);
         String[] vals = getData().split(" ");
         if(isNumeric(vals[0])) {
-            if(rightValue(vals[0])){
+            if(rightValue(vals[0],true)){
                 setK(Integer.parseInt(vals[0]));
             }else{
                 System.out.println("k doesn't match the expected value");
@@ -73,8 +84,14 @@ public class Cezar {
         readFile(path);
         String[] vals = getData().split(" ");
         if(isNumeric((vals[0])) && isNumeric((vals[1]))) {
-            setA(Integer.parseInt(vals[0]));
-            setB(Integer.parseInt(vals[1]));
+            if(aAffineValue(vals[0]) && rightValue(vals[1],false)) {
+                setA(Integer.parseInt(vals[0]));
+                setB(Integer.parseInt(vals[1]));
+            }else {
+                System.out.println("a and b  doesn't match the expected value");
+                System.exit(0);
+            }
+
         }else{
             System.out.println("Error");
             System.exit(0);
@@ -283,7 +300,7 @@ public class Cezar {
     }
 
     public static void main(String[] args) {
-        //getKeyAffine("files/key.txt");
+        getKeyAffine("files/key.txt");
         //readFile("files/plain.txt");
         //writeFile("files/crypto.txt",affineEncrypt(getData(),getA(),getB()),false);
         //affineCryptogram();
