@@ -121,7 +121,10 @@ public class Cezar {
         }
     }
 
-
+    public static boolean ifFileExists(String path) {
+        File myObj = new File(path);
+        return myObj.exists();
+    }
 
     public static void readFile(String path) {
         try {
@@ -227,7 +230,7 @@ public class Cezar {
     public static void caesarCryptogram() {
         readFile("files/crypto.txt");
         for(int k = 1; k < 26; k++) {
-            writeFile("files/decrypt.txt",caesarDecrypt(getData(),getK()),true);
+            writeFile("files/decrypt.txt",caesarDecrypt(getData(),k),true);
         }
     }
 
@@ -345,15 +348,21 @@ public class Cezar {
                 } else if(operation == 'd') {
                     System.out.println("---Caesar Decrypt---");
                     getKeyCaesar("files/key.txt");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Efifsnj e pwduytlwfknn",false);
                     readFile("files/crypto.txt");
                     System.out.println("Encrypt text = " + getData());
                     System.out.println("Decrypt text = " + caesarDecrypt(getData(),getK()));
                     writeFile("files/decrypt.txt",caesarDecrypt(getData(),getK()),false);
                 } else if(operation == 'j') {
                     System.out.println("---Caesar Known-plaintext attack---");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Efifsnj e pwduytlwfknn",false);
                     caesarCrypto();
                 } else {
                     System.out.println("---Caesar Brute-force attack--- ");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Efifsnj e pwduytlwfknn",false);
                     caesarCryptogram();
                     System.out.println("Attack completed");
                 }
@@ -367,6 +376,8 @@ public class Cezar {
                 } else if(operation == 'd') {
                     System.out.println("---Affine Decrypt---");
                     getKeyAffine("files/key.txt");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Dixivwc d gpyfzampihww",false);
                     readFile("files/crypto.txt");
                     System.out.println("Encrypt text = " + getData());
                     System.out.println("Decrypt text = " + affineDecrypt(getData(),getA(),getB()));
@@ -374,9 +385,13 @@ public class Cezar {
 
                 } else if(operation == 'j') {
                     System.out.println("---Affine Known-plaintext attack---");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Dixivwc d gpyfzampihww",false);
                     affineCrypto();
                 } else {
                     System.out.println("---Affine Brute-force attack--- ");
+                    if(!ifFileExists("files/crypto.txt"))
+                        writeFile("files/crypto.txt","Dixivwc d gpyfzampihww",false);
                     affineCryptogram();
                     System.out.println("Attack completed");
                 }
@@ -391,5 +406,3 @@ public class Cezar {
         core(args[0].charAt(0),args[1].charAt(0));
     }
 }
-
-
