@@ -55,10 +55,24 @@ public class Cezar {
             return (int)(c) - 97;
     }
 
+    public static int gcd(int a, int b)
+    {
+        if (b == 0)
+            return a;
+        return gcd(b, a % b);
+    }
+
+    public static int modularInverse(int a,int m)
+    {
+        BigInteger bi1 = new BigInteger(String.valueOf(a));
+        BigInteger bi2 = new BigInteger(String.valueOf(m));
+        return bi1.modInverse(bi2).intValue();
+    }
+
     public static boolean aAffineValue(String str) {
         int[] a ={1,3,5,7,9,11,15,17,19,21,23,25};
         for(int i:a)
-            if(i == Integer.parseInt(str))
+            if(i == Integer.parseInt(str) && gcd(Integer.parseInt(str),26) == 1)
                 return true;
         return false;
     }
@@ -76,6 +90,7 @@ public class Cezar {
         if(isNumeric(vals[0])) {
             if(rightValue(vals[0],true)){
                 setK(Integer.parseInt(vals[0]));
+                System.out.println("Key = " + getK());
             }else{
                 System.out.println("k doesn't match the expected value");
                 System.exit(0);
@@ -94,6 +109,7 @@ public class Cezar {
             if(aAffineValue(vals[0]) && rightValue(vals[1],false)) {
                 setA(Integer.parseInt(vals[0]));
                 setB(Integer.parseInt(vals[1]));
+                System.out.println("Key = (" + getA() + "," + getB() + ")");
             }else {
                 System.out.println("a and b  doesn't match the expected value");
                 System.exit(0);
@@ -130,27 +146,10 @@ public class Cezar {
             FileWriter fw = new FileWriter(myObj,append);
             fw.write(text + "\n");
             fw.close();
-            //PrintWriter pw = new PrintWriter(myObj);
-            //pw.println(text);
-            //pw.close();
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-    }
-
-    public static int gcd(int a, int b)
-    {
-        if (b == 0)
-            return a;
-        return gcd(b, a % b);
-    }
-
-    public static int modularInverse(int a,int m)
-    {
-        BigInteger bi1 = new BigInteger(String.valueOf(a));
-        BigInteger bi2 = new BigInteger(String.valueOf(m));
-        return bi1.modInverse(bi2).intValue();
     }
 
     public static String caesarEncrypt(String text, int k)
@@ -174,6 +173,7 @@ public class Cezar {
                 result.append(ch);
             }
         }
+        System.out.println("Encrypt text = " + result.toString());
         return result.toString();
     }
 
@@ -207,15 +207,19 @@ public class Cezar {
         readFile("files/crypto.txt");
         a = getData().charAt(0);
         readFile("files/extra.txt");
+        System.out.println("Known-plaintext = " + getData());
         b = getData().charAt(0);
         setK(Math.floorMod((int)a - (int)b,26));
-        System.out.println(getK());
         if(getK() >= 1 && 25 >= getK()){
+            System.out.println("Calculated key = " + getK());
             writeFile("files/key-found.txt",String.valueOf(getK()),false);
             readFile("files/crypto.txt");
+            System.out.println("Encrypt text = " + getData());
+            System.out.println("Decrypt text = " + caesarDecrypt(getData(),getK()));
             writeFile("files/decrypt.txt",caesarDecrypt(getData(),getK()),false);
         }
         else {
+            System.out.println("Error");
             System.exit(0);
         }
     }
@@ -229,7 +233,7 @@ public class Cezar {
 
     public static String affineEncrypt(String text, int a,int b) {
 
-        if(gcd(a,26) == 1) {
+        if( aAffineValue(String.valueOf(a))) {
             StringBuffer result= new StringBuffer();
             for (int i=0; i<text.length(); i++)
             {
@@ -246,6 +250,7 @@ public class Cezar {
                     result.append(ch);
                 }
             }
+            System.out.println("Encrypt text = " + result.toString());
             return result.toString();
 
         }
@@ -257,7 +262,7 @@ public class Cezar {
 
     public static String affineDecrypt(String text, int a,int b) {
 
-        if(gcd(a,26) == 1) {
+        if(aAffineValue(String.valueOf(a))) {
             StringBuffer result= new StringBuffer();
             for (int i=0; i<text.length(); i++)
             {
@@ -286,6 +291,7 @@ public class Cezar {
     public static void affineCrypto() {
         int a = 0, b = 0, x1 = 0, fx1 = 0, x2 = 0, fx2 = 0, q = 0, p = 0;
         readFile("files/extra.txt");
+        System.out.println("Known-plaintext = " + getData());
         x1 = ifLowerUpperCase(getData().charAt(0));
         x2 = ifLowerUpperCase(getData().charAt(1));
         readFile("files/crypto.txt");
@@ -302,9 +308,12 @@ public class Cezar {
             a = q;
         }
         b = Math.floorMod(fx1 - a * x1, 26);
-        if (gcd(a, 26) == 1 && b >= 0 && 25 >= b) {
+        if (aAffineValue(String.valueOf(a)) && rightValue(String.valueOf(b),false)) {
             writeFile("files/key-found.txt", a + " " + b, false);
+            System.out.println("Calculated key = (" + a +"," + b + ")");
             readFile("files/crypto.txt");
+            System.out.println("Encrypt text = " + getData());
+            System.out.println("Decrypt text = " + affineDecrypt(getData(),a,b));
             writeFile("files/decrypt.txt",affineDecrypt(getData(),a,b),false);
 
         } else {
@@ -326,41 +335,60 @@ public class Cezar {
 
     public static void core(char cipher,char operation) {
         if((cipher == 'a' || cipher == 'c') && (operation == 'e' || operation == 'd' || operation == 'j') || operation == 'k') {
-            if(cipher == 'a') {
-                System.out.println("Hello");
-            }else {
-                System.out.println("World");
+            if(cipher == 'c') {
+                if(operation == 'e') {
+                    System.out.println("---Caesar Encrypt---");
+                    getKeyCaesar("files/key.txt");
+                    readFile("files/plain.txt");
+                    System.out.println("Text = " + getData());
+                    writeFile("files/crypto.txt",caesarEncrypt(getData(),getK()),false);
+                } else if(operation == 'd') {
+                    System.out.println("---Caesar Decrypt---");
+                    getKeyCaesar("files/key.txt");
+                    readFile("files/crypto.txt");
+                    System.out.println("Encrypt text = " + getData());
+                    System.out.println("Decrypt text = " + caesarDecrypt(getData(),getK()));
+                    writeFile("files/decrypt.txt",caesarDecrypt(getData(),getK()),false);
+                } else if(operation == 'j') {
+                    System.out.println("---Caesar Known-plaintext attack---");
+                    caesarCrypto();
+                } else {
+                    System.out.println("---Caesar Brute-force attack--- ");
+                    caesarCryptogram();
+                    System.out.println("Attack completed");
+                }
+            } else {
+                if(operation == 'e') {
+                    System.out.println("---Affine Encrypt---");
+                    getKeyAffine("files/key.txt");
+                    readFile("files/plain.txt");
+                    System.out.println("Text = " + getData());
+                    writeFile("files/crypto.txt",affineEncrypt(getData(),getA(),getB()),false);
+                } else if(operation == 'd') {
+                    System.out.println("---Affine Decrypt---");
+                    getKeyAffine("files/key.txt");
+                    readFile("files/crypto.txt");
+                    System.out.println("Encrypt text = " + getData());
+                    System.out.println("Decrypt text = " + affineDecrypt(getData(),getA(),getB()));
+                    writeFile("files/decrypt.txt",affineDecrypt(getData(),getA(),getB()),false);
+
+                } else if(operation == 'j') {
+                    System.out.println("---Affine Known-plaintext attack---");
+                    affineCrypto();
+                } else {
+                    System.out.println("---Affine Brute-force attack--- ");
+                    affineCryptogram();
+                    System.out.println("Attack completed");
+                }
             }
         }else {
+            System.out.println("Error");
             System.exit(0);
         }
     }
 
     public static void main(String[] args) {
-        //affineCrypto();
-        //getKeyAffine("files/key.txt");
-        //readFile("files/plain.txt");
-        //writeFile("files/crypto.txt",affineEncrypt(getData(),getA(),getB()),false);
-        //affineCryptogram();
-        //getKeyAffine("files/key.txt");
-        //readFile("files/plain.txt");
-        //System.out.println(affineEncrypt(getData(),getA(),getB()));
-        //setData(affineEncrypt(getData(),getA(),getB()));
-        //System.out.println(affineDecrypt(getData(),getA(),getB()));
-        /*
-        if(modularInverse(1,26) == 1){
-            System.out.println("Hello");
-        }else{
-            System.out.println("Adam");
-        }
-        //caesarCryptogram();
-        //getKey();
-        //readFile("files/plain.txt");
-        //writeFile("files/crypto.txt",encrypt(getData(),getK()));
-        //readFile("files/crypto.txt");
-        //writeFile("files/decrypt.txt",decrypt(getData(),getK()));
-        */
-
+        core(args[0].charAt(0),args[1].charAt(0));
     }
 }
 
