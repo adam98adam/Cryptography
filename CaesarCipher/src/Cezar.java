@@ -48,6 +48,13 @@ public class Cezar {
         }
     }
 
+    public static int ifLowerUpperCase(Character c) {
+        if(Character.isUpperCase(c))
+            return (int)(c) - 65;
+        else
+            return (int)(c) - 97;
+    }
+
     public static boolean aAffineValue(String str) {
         int[] a ={1,3,5,7,9,11,15,17,19,21,23,25};
         for(int i:a)
@@ -276,6 +283,36 @@ public class Cezar {
         }
     }
 
+    public static void affineCrypto() {
+        int a = 0, b = 0, x1 = 0, fx1 = 0, x2 = 0, fx2 = 0, q = 0, p = 0;
+        readFile("files/extra.txt");
+        x1 = ifLowerUpperCase(getData().charAt(0));
+        x2 = ifLowerUpperCase(getData().charAt(1));
+        readFile("files/crypto.txt");
+        fx1 = ifLowerUpperCase(getData().charAt(0));
+        fx2 = ifLowerUpperCase(getData().charAt(1));
+        q = Math.floorMod(fx1 - fx2, 26);
+        p = Math.floorMod(x1 - x2, 26);
+        if (q % p == 0) {
+            q = q / p;
+            a = q;
+        } else {
+            q = q * modularInverse(p, 26);
+            q = Math.floorMod(q, 26);
+            a = q;
+        }
+        b = Math.floorMod(fx1 - a * x1, 26);
+        if (gcd(a, 26) == 1 && b >= 0 && 25 >= b) {
+            writeFile("files/key-found.txt", a + " " + b, false);
+            readFile("files/crypto.txt");
+            writeFile("files/decrypt.txt",affineDecrypt(getData(),a,b),false);
+
+        } else {
+            System.out.println("Error");
+            System.exit(0);
+        }
+    }
+
     public static void affineCryptogram() {
         int[] a ={1,3,5,7,9,11,15,17,19,21,23,25};
         readFile("files/crypto.txt");
@@ -300,7 +337,8 @@ public class Cezar {
     }
 
     public static void main(String[] args) {
-        getKeyAffine("files/key.txt");
+        //affineCrypto();
+        //getKeyAffine("files/key.txt");
         //readFile("files/plain.txt");
         //writeFile("files/crypto.txt",affineEncrypt(getData(),getA(),getB()),false);
         //affineCryptogram();
